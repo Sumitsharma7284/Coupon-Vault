@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CouponVault</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ── HEADER ───────────────────────────────────────────────── -->
+  <header>
+    <div class="header-logo">
+      <div class="logo-mark">🏷️</div>
+      <span class="logo-text">Coupon<strong>Vault</strong></span>
+    </div>
+    <div class="header-right">
+      <span class="user-badge">👤 <span id="username-display"></span></span>
+      <button class="btn-logout" onclick="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- ── MAIN LAYOUT ───────────────────────────────────────────── -->
+  <div class="app-wrap">
+
+    <!-- STATS ROW -->
+    <div class="stats-row" id="stats-row"></div>
+
+    <!-- TWO COLUMN LAYOUT -->
+    <div class="two-col">
+
+      <!-- LEFT: ADD / EDIT FORM -->
+      <aside class="form-panel">
+        <div class="panel-header">
+          <h2 id="form-title">Add Coupon</h2>
+        </div>
+
+        <div class="field-group">
+          <label>Store</label>
+          <input id="f-store" type="text" placeholder="e.g. Amazon"/>
+        </div>
+        <div class="field-group">
+          <label>Coupon Code</label>
+          <input id="f-code" type="text" placeholder="e.g. SAVE20"/>
+        </div>
+        <div class="field-group">
+          <label>Discount</label>
+          <input id="f-discount" type="text" placeholder="e.g. 20% OFF"/>
+        </div>
+        <div class="field-group">
+          <label>Category</label>
+          <select id="f-category">
+            <option value="fashion">👗 Fashion</option>
+            <option value="food">🍕 Food</option>
+            <option value="tech">💻 Tech</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="beauty">💄 Beauty</option>
+            <option value="home">🏠 Home</option>
+            <option value="other">📦 Other</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>Expiry Date</label>
+          <input id="f-expiry" type="date"/>
+        </div>
+        <div class="field-group">
+          <label>Description <span class="optional">(optional)</span></label>
+          <input id="f-desc" type="text" placeholder="Short note about the coupon"/>
+        </div>
+
+        <div class="form-buttons">
+          <button class="btn-save"   onclick="saveCoupon()">💾 Save Coupon</button>
+          <button class="btn-cancel" id="btn-cancel" onclick="cancelEdit()" style="display:none">✕ Cancel</button>
+        </div>
+      </aside>
+
+      <!-- RIGHT: LIST -->
+      <section class="list-panel">
+
+        <!-- FILTER BAR -->
+        <div class="filter-bar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input id="search" type="text" placeholder="Search store, code…" oninput="renderList()"/>
+          </div>
+          <select id="filter-cat" onchange="renderList()">
+            <option value="">All Categories</option>
+            <option value="fashion">👗 Fashion</option>
+            <option value="food">🍕 Food</option>
+            <option value="tech">💻 Tech</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="beauty">💄 Beauty</option>
+            <option value="home">🏠 Home</option>
+            <option value="other">📦 Other</option>
+          </select>
+          <select id="filter-status" onchange="renderList()">
+            <option value="">All Status</option>
+            <option value="active">✅ Active</option>
+            <option value="expiring">⚡ Expiring Soon</option>
+            <option value="expired">❌ Expired</option>
+          </select>
+        </div>
+
+        <!-- COUPON CARDS -->
+        <div id="coupon-list"></div>
+
+      </section>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
