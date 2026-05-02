@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CouponVault — Register</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="auth-page">
+
+  <div class="bg-scene">
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="bg-noise"></div>
+  </div>
+
+  <div class="auth-split">
+
+    <!-- LEFT PANEL -->
+    <div class="auth-brand">
+      <div class="brand-inner">
+        <div class="brand-logo">
+          <div class="logo-gem">◆</div>
+          <span>CouponVault</span>
+        </div>
+        <h2 class="brand-headline">Start saving<br/><em>smarter.</em></h2>
+        <p class="brand-desc">Join thousands who never let a great deal slip through their fingers.</p>
+        <ul class="brand-perks">
+          <li>✦ Unlimited coupon storage</li>
+          <li>✦ Smart expiry tracking</li>
+          <li>✦ One-click code copy</li>
+          <li>✦ 7 category organisation</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RIGHT PANEL -->
+    <div class="auth-form-side">
+      <div class="auth-card">
+
+        <div class="auth-card-header">
+          <p class="auth-tag">GET STARTED</p>
+          <h1 class="auth-title">Create account</h1>
+          <p class="auth-sub">Fill in the details below to join</p>
+        </div>
+
+        <div id="auth-error" class="alert alert-error" style="display:none"></div>
+
+        <div class="field-wrap">
+          <label class="field-label">Full Name</label>
+          <div class="field-box">
+            <span class="field-icon">◉</span>
+            <input id="r-name" type="text" class="field-input" placeholder="your full name" autocomplete="name"/>
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <label class="field-label">Username</label>
+          <div class="field-box">
+            <span class="field-icon">◈</span>
+            <input id="r-user" type="text" class="field-input" placeholder="choose a username" autocomplete="username"/>
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <label class="field-label">Password</label>
+          <div class="field-box">
+            <span class="field-icon">◇</span>
+            <input id="r-pass" type="password" class="field-input" placeholder="choose a password" autocomplete="new-password"/>
+            <button class="field-eye" onclick="togglePw('r-pass')" type="button">⊙</button>
+          </div>
+          <!-- Strength bar -->
+          <div class="strength-row" id="strength-row" style="display:none">
+            <div class="strength-track">
+              <div class="strength-fill" id="strength-fill"></div>
+            </div>
+            <span class="strength-lbl" id="strength-lbl"></span>
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <label class="field-label">Confirm Password</label>
+          <div class="field-box">
+            <span class="field-icon">◇</span>
+            <input id="r-pass2" type="password" class="field-input" placeholder="repeat your password" autocomplete="new-password"/>
+            <button class="field-eye" onclick="togglePw('r-pass2')" type="button">⊙</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-reg" onclick="doRegister()">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-arrow">→</span>
+        </button>
+
+        <p class="auth-switch">Already have an account? <a href="login.html">Sign in</a></p>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    if (localStorage.getItem('cv_user')) location.href = 'index.html';
+
+    document.getElementById('r-pass').addEventListener('input', function () {
+      const val = this.value;
+      const row  = document.getElementById('strength-row');
+      const fill = document.getElementById('strength-fill');
+      const lbl  = document.getElementById('strength-lbl');
+      if (!val) { row.style.display = 'none'; return; }
+      row.style.display = 'flex';
+      let score = 0;
+      if (val.length >= 6)          score++;
+      if (val.length >= 10)         score++;
+      if (/[A-Z]/.test(val))        score++;
+      if (/[0-9]/.test(val))        score++;
+      if (/[^A-Za-z0-9]/.test(val)) score++;
+      const levels = [
+        { label: 'Very weak',   color: '#ef4444', w: '15%'  },
+        { label: 'Weak',        color: '#f97316', w: '35%'  },
+        { label: 'Fair',        color: '#eab308', w: '55%'  },
+        { label: 'Strong',      color: '#c5a028', w: '78%'  },
+        { label: 'Very strong', color: '#d4af37', w: '100%' },
+      ];
+      const l = levels[Math.min(score, 4)];
+      fill.style.width = l.w;
+      fill.style.background = l.color;
+      lbl.textContent = l.label;
+      lbl.style.color = l.color;
+    });
+
+    async function doRegister() {
+      const name     = document.getElementById('r-name').value.trim();
+      const username = document.getElementById('r-user').value.trim();
+      const password = document.getElementById('r-pass').value;
+      const pass2    = document.getElementById('r-pass2').value;
+
+      if (!name || !username || !password || !pass2) return showAlert('Please fill in all fields.');
+      if (username.length < 3)  return showAlert('Username must be at least 3 characters.');
+      if (password.length < 4)  return showAlert('Password must be at least 4 characters.');
+      if (password !== pass2)   return showAlert('Passwords do not match.');
+
+      const btn = document.getElementById('btn-reg');
+      btn.classList.add('loading');
+      btn.disabled = true;
+
+      try {
+        const res  = await fetch('/api/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, username, password }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          showAlert(data.error || 'Registration failed.');
+        } else {
+          btn.classList.add('success');
+          btn.querySelector('.btn-text').textContent = 'Account created!';
+          setTimeout(() => location.href = 'login.html?registered=1', 700);
+        }
+      } catch {
+        showAlert('Cannot connect to server.');
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+
+    function showAlert(msg) {
+      const el = document.getElementById('auth-error');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(() => el.style.display = 'none', 4000);
+    }
+
+    function togglePw(id) {
+      const inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') doRegister(); });
+  </script>
+</body>
+</html>

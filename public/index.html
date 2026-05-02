@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CouponVault — Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="app-page">
+
+  <!-- ── HEADER ──────────────────────────────────────────────────── -->
+  <header class="app-header">
+    <div class="header-logo">
+      <div class="logo-gem">◆</div>
+      <span class="logo-name">CouponVault</span>
+    </div>
+    <nav class="header-nav">
+      <span class="nav-greeting">Hello, <strong id="username-display"></strong></span>
+    </nav>
+    <button class="btn-logout" onclick="logout()">Sign out ↗</button>
+  </header>
+
+  <div class="app-body">
+
+    <!-- ── SIDEBAR ─────────────────────────────────────────────────── -->
+    <aside class="sidebar">
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Overview</p>
+        <div class="stat-tiles" id="stat-tiles"></div>
+      </div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Filter</p>
+        <div class="filter-group" id="filter-group">
+          <button class="filter-pill active" data-filter="all" onclick="setFilter(this,'all')">All</button>
+          <button class="filter-pill" data-filter="active"   onclick="setFilter(this,'active')">✅ Active</button>
+          <button class="filter-pill" data-filter="expiring" onclick="setFilter(this,'expiring')">⚡ Expiring</button>
+          <button class="filter-pill" data-filter="expired"  onclick="setFilter(this,'expired')">❌ Expired</button>
+        </div>
+      </div>
+
+      <div class="sidebar-section">
+        <p class="sidebar-label">Category</p>
+        <div class="filter-group">
+          <button class="cat-pill active" data-cat="" onclick="setCat(this,'')">All</button>
+          <button class="cat-pill" data-cat="fashion" onclick="setCat(this,'fashion')">👗 Fashion</button>
+          <button class="cat-pill" data-cat="food"    onclick="setCat(this,'food')">🍕 Food</button>
+          <button class="cat-pill" data-cat="tech"    onclick="setCat(this,'tech')">💻 Tech</button>
+          <button class="cat-pill" data-cat="travel"  onclick="setCat(this,'travel')">✈️ Travel</button>
+          <button class="cat-pill" data-cat="beauty"  onclick="setCat(this,'beauty')">💄 Beauty</button>
+          <button class="cat-pill" data-cat="home"    onclick="setCat(this,'home')">🏠 Home</button>
+          <button class="cat-pill" data-cat="other"   onclick="setCat(this,'other')">📦 Other</button>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ── MAIN ────────────────────────────────────────────────────── -->
+    <main class="main-area">
+
+      <!-- Top toolbar -->
+      <div class="main-toolbar">
+        <div class="search-box">
+          <span class="search-ico">⊹</span>
+          <input type="text" id="search" placeholder="Search coupons, stores, codes…" oninput="renderList()"/>
+        </div>
+        <button class="btn-add" onclick="openForm()">
+          <span>＋</span> Add Coupon
+        </button>
+      </div>
+
+      <!-- Section heading -->
+      <div class="section-head">
+        <h2 class="section-title" id="section-title">All Coupons</h2>
+        <span class="section-count" id="section-count"></span>
+      </div>
+
+      <!-- Coupon grid -->
+      <div class="coupon-grid" id="coupon-grid"></div>
+
+    </main>
+  </div>
+
+  <!-- ── SLIDE-IN FORM DRAWER ────────────────────────────────────── -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeForm()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h3 class="drawer-title" id="drawer-title">New Coupon</h3>
+      <button class="drawer-close" onclick="closeForm()">✕</button>
+    </div>
+
+    <div class="drawer-body">
+      <div class="field-wrap">
+        <label class="field-label">Store / Brand</label>
+        <div class="field-box">
+          <input id="f-store" type="text" class="field-input" placeholder="e.g. Amazon, Flipkart"/>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Coupon Code</label>
+        <div class="field-box mono">
+          <input id="f-code" type="text" class="field-input" placeholder="e.g. SAVE20"/>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Discount</label>
+        <div class="field-box">
+          <input id="f-discount" type="text" class="field-input" placeholder="e.g. 20% OFF or ₹200"/>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Category</label>
+        <div class="field-box">
+          <select id="f-category" class="field-input">
+            <option value="fashion">👗 Fashion</option>
+            <option value="food">🍕 Food</option>
+            <option value="tech">💻 Tech</option>
+            <option value="travel">✈️ Travel</option>
+            <option value="beauty">💄 Beauty</option>
+            <option value="home">🏠 Home</option>
+            <option value="other">📦 Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Expiry Date</label>
+        <div class="field-box">
+          <input id="f-expiry" type="date" class="field-input"/>
+        </div>
+      </div>
+      <div class="field-wrap">
+        <label class="field-label">Description <span style="opacity:.4;font-size:11px">(optional)</span></label>
+        <div class="field-box">
+          <input id="f-desc" type="text" class="field-input" placeholder="Short note…"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-footer">
+      <button class="btn-drawer-cancel" onclick="closeForm()">Cancel</button>
+      <button class="btn-drawer-save"   id="btn-save" onclick="saveCoupon()">
+        <span class="btn-text">Save Coupon</span>
+        <span class="btn-arrow">→</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

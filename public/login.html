@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CouponVault — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body class="auth-page">
+
+  <div class="bg-scene">
+    <div class="bg-grid"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="bg-noise"></div>
+  </div>
+
+  <div class="auth-split">
+    <div class="auth-brand">
+      <div class="brand-inner">
+        <div class="brand-logo">
+          <div class="logo-gem">◆</div>
+          <span>CouponVault</span>
+        </div>
+        <h2 class="brand-headline">Every deal,<br/><em>organised.</em></h2>
+        <p class="brand-desc">The smartest way to store, manage and never miss a coupon again.</p>
+        <div class="brand-stats">
+          <div class="bstat"><span class="bstat-num">∞</span><span class="bstat-label">Coupons</span></div>
+          <div class="bstat-div"></div>
+          <div class="bstat"><span class="bstat-num">7</span><span class="bstat-label">Categories</span></div>
+          <div class="bstat-div"></div>
+          <div class="bstat"><span class="bstat-num">0₹</span><span class="bstat-label">Cost</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-form-side">
+      <div class="auth-card">
+        <div class="auth-card-header">
+          <p class="auth-tag">WELCOME BACK</p>
+          <h1 class="auth-title">Sign in</h1>
+          <p class="auth-sub">Enter your credentials to continue</p>
+        </div>
+
+        <div id="auth-error"   class="alert alert-error"   style="display:none"></div>
+        <div id="auth-success" class="alert alert-success" style="display:none"></div>
+
+        <div class="field-wrap">
+          <label class="field-label">Username</label>
+          <div class="field-box">
+            <span class="field-icon">◉</span>
+            <input id="l-user" type="text" class="field-input" placeholder="your username" autocomplete="username"/>
+          </div>
+        </div>
+
+        <div class="field-wrap">
+          <label class="field-label">Password</label>
+          <div class="field-box">
+            <span class="field-icon">◈</span>
+            <input id="l-pass" type="password" class="field-input" placeholder="your password" autocomplete="current-password"/>
+            <button class="field-eye" onclick="togglePw('l-pass')" type="button">⊙</button>
+          </div>
+        </div>
+
+        <button class="btn-primary" id="btn-login" onclick="doLogin()">
+          <span class="btn-text">Sign In</span>
+          <span class="btn-arrow">→</span>
+        </button>
+
+        <p class="auth-switch">New here? <a href="register.html">Create an account</a></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Only redirect if already logged in
+    var user = localStorage.getItem('cv_user');
+    if (user) {
+      window.location.replace('index.html');
+    }
+
+    if (new URLSearchParams(location.search).get('registered')) {
+      document.getElementById('auth-success').textContent = '✦ Account created. Please sign in.';
+      document.getElementById('auth-success').style.display = 'block';
+    }
+
+    async function doLogin() {
+      var username = document.getElementById('l-user').value.trim();
+      var password = document.getElementById('l-pass').value;
+
+      if (!username || !password) {
+        return showErr('Please enter username and password.');
+      }
+
+      var btn = document.getElementById('btn-login');
+      btn.disabled = true;
+      btn.querySelector('.btn-text').textContent = 'Signing in…';
+
+      try {
+        var res  = await fetch('/api/login', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ username: username, password: password })
+        });
+        var data = await res.json();
+
+        if (!res.ok) {
+          showErr(data.error || 'Login failed.');
+        } else {
+          // Save to localStorage then go to app
+          localStorage.setItem('cv_user', data.username);
+          localStorage.setItem('cv_name', data.name || data.username);
+          window.location.replace('index.html');
+        }
+      } catch(e) {
+        showErr('Cannot connect to server. Is it running?');
+      }
+
+      btn.disabled = false;
+      btn.querySelector('.btn-text').textContent = 'Sign In';
+    }
+
+    function showErr(msg) {
+      var el = document.getElementById('auth-error');
+      el.textContent = msg;
+      el.style.display = 'block';
+      setTimeout(function(){ el.style.display = 'none'; }, 4000);
+    }
+
+    function togglePw(id) {
+      var inp = document.getElementById(id);
+      inp.type = inp.type === 'password' ? 'text' : 'password';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') doLogin();
+    });
+  </script>
+</body>
+</html>
